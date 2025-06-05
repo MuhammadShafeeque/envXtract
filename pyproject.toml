@@ -78,5 +78,15 @@ line-ending = "auto"
 [tool.bumpver]
 current_version = "0.1.2"
 version_pattern = "MAJOR.MINOR.PATCH"
+commit_message = "bump version {old_version} -> {new_version}"
 commit = true
 tag = true
+push = false
+
+[tool.bumpver.file_patterns]
+"pyproject.toml" = [
+    'version = "{version}"',
+]
+"envxtract/__init__.py" = [
+    '__version__ = "{version}"',
+]
