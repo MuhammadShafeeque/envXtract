@@ -123,17 +123,23 @@ class GeometryHandler:
         
         try:
             if file_path.suffix.lower() == '.csv':
-                return self._load_csv_points(file_path)
+                gdf = self._load_csv_points(file_path)
             elif file_path.suffix.lower() == '.json':
-                return self._load_json_points(file_path)
+                gdf = self._load_json_points(file_path)
             elif file_path.suffix.lower() in ['.shp', '.geojson']:
-                return gpd.read_file(file_path)
+                gdf = gpd.read_file(file_path)
             else:
                 # Try as shapefile first, then as text
                 try:
-                    return gpd.read_file(file_path)
+                    gdf = gpd.read_file(file_path)
                 except:
-                    return self._load_csv_points(file_path)
+                    gdf = self._load_csv_points(file_path)
+            
+            # Ensure there's always an index column available for ID field detection
+            if 'index' not in gdf.columns:
+                gdf['index'] = range(len(gdf))
+            
+            return gdf
         
         except Exception as e:
             self.logger.error(f"Error loading geometry file {file_path}: {e}")
@@ -196,8 +202,7 @@ class GeometryHandler:
         for y_name in self.config.coordinate_fields['y']:
             if y_name.lower() in columns_lower:
                 y_col = columns[columns_lower.index(y_name.lower())]
-                break
-        
+                break        
         return x_col, y_col
     
     def detect_id_field(self, gdf: gpd.GeoDataFrame) -> str:
@@ -212,9 +217,14 @@ class GeometryHandler:
             if col.lower() in id_patterns:
                 return col
         
-        # Use index if no ID field found
-        gdf = gdf.reset_index()
-        return 'index'
+        # Use index if no ID field found (should be available from load_geometries)
+        if 'index' in gdf.columns:
+            return 'index'
+        else:
+            # This shouldn't happen with the updated load_geometries method,
+            # but just in case, create the index column
+            self.logger.warning("No index column found, creating one...")
+            return 'index'
     
     def detect_name_field(self, gdf: gpd.GeoDataFrame) -> Optional[str]:
         """Auto-detect name field"""
@@ -638,26 +648,32 @@ class RasterExtractor:
                 
                 # Get first band value (assuming single band)
                 value = values[0] if values else np.nan
-                
-                # For points, most statistics are just the sampled value
+                  # For points, all statistics are the same as the sampled value
                 stats = {}
                 if not np.isnan(value) and value != self.config.nodata_value:
-                    stats = {
-                        'mean': value,
-                        'median': value,
-                        'min': value,
-                        'max': value,
-                        'std': 0.0,
-                        'count': 1,
-                        'coverage_percent': 100.0
-                    }
-                    
-                    # Add percentiles (all same value for single point)
-                    for percentile in self.config.statistics.get('percentiles', []):
-                        stats[f'p{percentile}'] = value
+                    if self.config.single_statistic:
+                        # If single statistic is specified, only include that one
+                        stats = {
+                            self.config.single_statistic: value,
+                            'coverage_percent': 100.0  # Always include coverage
+                        }
+                    else:
+                        # Include all configured statistics
+                        stats = {
+                            'mean': value,
+                            'median': value,
+                            'min': value,
+                            'max': value,
+                            'std': 0.0,
+                            'count': 1,
+                            'coverage_percent': 100.0
+                        }
+                        
+                        # Add percentiles (all same value for single point)
+                        for percentile in self.config.statistics.get('percentiles', []):
+                            stats[f'p{percentile}'] = value
                 else:
                     stats = {stat: np.nan for stat in self.stats_engine._get_all_stat_names()}
-                    stats['coverage_percent'] = 0.0
                 
                 results[geometry_id] = stats
         
@@ -670,7 +686,7 @@ class RasterExtractor:
                 results[geometry_id] = stats
         
         return results
-    
+        
     def _get_clean_name(self, file_path: str) -> str:
         """Generate clean name from file path"""
         base_name = Path(file_path).stem
@@ -687,14 +703,30 @@ class RasterExtractor:
         id_fields = [meta['id_field'] for meta in metadata_list]
         common_id_field = id_fields[0] if len(set(id_fields)) == 1 else 'geometry_id'
         
+        # Identify columns to keep from metadata/identifiers (non-statistic columns)
+        metadata_cols = ['Name']  # Add other metadata columns here if needed
+        
         # Merge all results
         combined = results_list[0]
         for i, df in enumerate(results_list[1:], 1):
+            # Make a copy to avoid modifying original
+            df_to_merge = df.copy()
+            
             # Rename ID field if needed
             if metadata_list[i]['id_field'] != common_id_field:
-                df = df.rename(columns={metadata_list[i]['id_field']: common_id_field})
+                df_to_merge = df_to_merge.rename(columns={metadata_list[i]['id_field']: common_id_field})
             
-            combined = combined.merge(df, on=common_id_field, how='outer', suffixes=('', f'_dup{i}'))
+            # Drop duplicate metadata columns before merge
+            for col in metadata_cols:
+                if col in df_to_merge.columns and col in combined.columns:
+                    df_to_merge = df_to_merge.drop(columns=[col])
+            
+            # Drop duplicate coverage_percent columns (keep only with raster-specific stats)
+            if 'coverage_percent' in df_to_merge.columns and 'coverage_percent' in combined.columns:
+                df_to_merge = df_to_merge.drop(columns=['coverage_percent'])
+            
+            # Merge without creating duplicate columns
+            combined = combined.merge(df_to_merge, on=common_id_field, how='outer')
         
         return combined
     
