@@ -1,9 +1,61 @@
 [project]
 name = "envxtract"
 version = "0.1.3"
-description = "Data extraction and analysis of environmental variables"
+description = "Data extraction and analysis of environmental variables from geospatial data formats"
 authors = [{ name = "Muhammad Shafeeque", email = "shafeequ@uni-bremen.de" }]
+maintainers = [{ name = "Muhammad Shafeeque", email = "shafeequ@uni-bremen.de" }]
+license = { text = "MIT" }
+readme = "README.md"
 requires-python = ">=3.13"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: GIS",
+    "Topic :: Scientific/Engineering :: Atmospheric Science",
+    "Topic :: Scientific/Engineering :: Hydrology",
+    "Topic :: Scientific/Engineering :: Physics",
+    "Environment :: Console",
+    "Natural Language :: English",
+]
+keywords = [
+    "environmental-data",
+    "geospatial",
+    "raster",
+    "netcdf", 
+    "geotiff",
+    "data-extraction",
+    "spatial-analysis",
+    "climate-data",
+    "atmospheric-science",
+    "polar-research",
+    "marine-research",
+    "awi"
+]
+
+[project.urls]
+Homepage = "https://github.com/MuhammadShafeeque/envXtract"
+Repository = "https://github.com/MuhammadShafeeque/envXtract.git"
+Documentation = "https://github.com/MuhammadShafeeque/envXtract#readme"
+"Bug Tracker" = "https://github.com/MuhammadShafeeque/envXtract/issues"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.4.0",
+    "pytest-cov>=4.0.0",
+    "black>=23.0.0",
+    "isort>=5.12.0",
+    "flake8>=6.0.0",
+    "mypy>=1.0.0",
+]
+docs = [
+    "sphinx>=6.0.0",
+    "sphinx-rtd-theme>=1.2.0",
+]
+
 dependencies = [
     "build>=1.2.2.post1",
     "bumpver>=2024.1130",

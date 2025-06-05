@@ -1,6 +1,6 @@
 # Advanced Raster Extraction Configuration Examples
 
-## 🚀 Quick Start - Generate Config Files
+## Quick Start - Generate Config Files
 
 ```bash
 # Create comprehensive config with all options explained
@@ -10,7 +10,7 @@ python raster_extractor.py --create-config
 python raster_extractor.py --create-scenarios
 ```
 
-## 📋 Configuration File Examples
+## Configuration File Examples
 
 ### 1. **Simple Mean-Only Extraction** (`config_simple_mean.yaml`)
 
@@ -143,7 +143,7 @@ process_points: false  # Skip points
 save_csv: true
 ```
 
-## 🎯 Usage Examples
+## Usage Examples
 
 ### Command Line Usage
 
