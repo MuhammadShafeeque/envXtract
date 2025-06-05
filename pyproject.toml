@@ -6,13 +6,17 @@ authors = [{ name = "Muhammad Shafeeque", email = "shafeequ@uni-bremen.de" }]
 requires-python = ">=3.13"
 dependencies = [
     "build>=1.2.2.post1",
+    "folium>=0.19.7",
     "geopandas>=1.1.0",
+    "jupyter>=1.1.1",
     "matplotlib>=3.10.3",
     "numpy>=2.2.6",
     "pandas>=2.3.0",
     "pytest>=8.4.0",
     "pyyaml>=6.0.2",
     "rasterio>=1.4.3",
+    "scipy>=1.15.3",
+    "seaborn>=0.13.2",
     "twine>=6.1.0",
     "xarray>=2025.4.0",
 ]
