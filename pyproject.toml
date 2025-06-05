@@ -76,7 +76,7 @@ skip-magic-trailing-comma = false
 line-ending = "auto"
 
 [tool.bumpver]
-current_version = "0.1.0"
+current_version = "0.1.2"
 version_pattern = "MAJOR.MINOR.PATCH"
 commit = true
 tag = true
