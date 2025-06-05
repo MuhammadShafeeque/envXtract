@@ -6,6 +6,7 @@ authors = [{ name = "Muhammad Shafeeque", email = "shafeequ@uni-bremen.de" }]
 requires-python = ">=3.13"
 dependencies = [
     "build>=1.2.2.post1",
+    "bumpver>=2024.1130",
     "folium>=0.19.7",
     "geopandas>=1.1.0",
     "jupyter>=1.1.1",
@@ -73,3 +74,9 @@ quote-style = "double"
 indent-style = "space"
 skip-magic-trailing-comma = false
 line-ending = "auto"
+
+[tool.bumpver]
+current_version = "0.1.0"
+version_pattern = "MAJOR.MINOR.PATCH"
+commit = true
+tag = true

@@ -4,4 +4,4 @@ version_pattern = "MAJOR.MINOR.PATCH"
 
 [bumpver.file_patterns]
 "pyproject.toml" = ['version = "{version}"']
-"pollution_extraction/__init__.py" = ['__version__ = "{version}"']
+"envxtract/__init__.py" = ['__version__ = "{version}"']
