@@ -1,4 +1,4 @@
-__version__ = "0.1.2"
+__version__ = "0.1.3"
 __author__ = "Muhammad Shafeeque"
 __email__ = "muhammad.shafeeque@awi.de"
 __institution__ = "Alfred Wegener Institute (AWI)"
